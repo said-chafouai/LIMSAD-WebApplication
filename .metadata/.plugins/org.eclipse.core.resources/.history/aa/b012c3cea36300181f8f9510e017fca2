@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+	<title> Communication dans une conference  </title>
+    <!-- inclusion Generale ############################################################"" -->
+    
+    		<c:import url="include/headInclude.jsp"></c:import>
+    
+    <!-- ################################################################################ -->
+
+</head>
+
+<body>
+
+<c:choose>
+<c:when test="${sessionScope.etatSession==true}">   
+	<c:if test="${empty sessionScope.role}">
+		<jsp:forward page="accueil.jsp"/>
+	</c:if> 
+
+	<div id="wrapper">
+	
+	<!-- Menu inclusion ############################################################-->
+	
+        		<c:import url="include/menuDirecteurInclude.jsp"/>
+        		
+   <!-- ################################################################################ -->
+
+        <!-- Page Content -->
+        <div id="page-wrapper">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <h1 class="page-header"><i class="fa fa-group  fa-fw"></i>Equipes</h1>
+                         <!-- Nav tabs -->
+                                <ul class="nav nav-pills">
+                                	<p>
+                                    <a href="#visulaiser" data-toggle="tab" class="btn btn-primary">Visulaiser</a>
+                                    <a href="#ajouter" data-toggle="tab" class="btn btn-success">Ajouter</a>
+                                    <a href="#modifier" data-toggle="tab" class="btn btn-warning">Modifier</a>
+                                    <a href="#supprimer" data-toggle="tab" class="btn btn-danger">Supprimer</a>
+                                    </p>
+                                </ul>
+
+                            <!-- Tab panes -->
+                            <div class="tab-content">
+                                <div class="tab-pane fade in active table-responsive" id="visulaiser">
+										<table class="table table-bordered">
+											<tr>
+												<th>Intitule</th>
+												<th>Chef d'equipe</th>
+												<th>Membre(s)</th>
+												<th>Doctorant(s)</th>
+											</tr>
+											<tr>
+											
+											</tr>
+											<c:forEach items="${ouvragesAttentes}" var="ouvrageAttente">
+												<tr>
+													<td>${ouvrageAttente.intitule}</td>
+													<td>${ouvrageAttente.maisonEdition}</td>
+													<td>${ouvrageAttente.issn}</td>
+													<td>${ouvrageAttente.isbn}</td>
+													<td>${ouvrageAttente.dateOuvrage}</td>
+													<td>${ouvrageAttente.acteurExterne}</td>
+													<td><font color="red">En Attente</font></td>
+												</tr>
+											</c:forEach>
+										</table>
+									</div>
+                                <div class="tab-pane fade" id="ajouter">
+                                    <c:forEach items="${equipesStructure}"  var="equipe">
+                                    	<p>${equipe.nom} ${equipe.chef }</p>
+                                    </c:forEach>
+                                </div>
+                                <div class="tab-pane fade" id="modifier">
+                                    
+                                </div>
+                                <div class="tab-pane fade" id="supprimer">
+                                    
+                                </div>
+                            </div>
+                        <!-- /.panel-body -->
+                    </div>
+                    <!-- /.col-lg-12 -->
+                </div>
+                <!-- /.row -->
+            </div>
+            <!-- /.container-fluid -->
+        </div>
+        <!-- /#page-wrapper -->
+
+    </div>
+    <!-- /#wrapper -->
+
+ 
+<!-- Footer inclusion ############################################################-->
+
+        <c:import url="include/footerInclude.jsp"></c:import>
+        
+<!-- ################################################################################ -->
+    
+</c:when>
+<c:when test="${ empty sessionScope.etatSession}">
+<jsp:forward page="accueil.jsp"/>
+</c:when>
+</c:choose>
+
+</body>
+
+</html>

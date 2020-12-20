@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+	<title> Notifications  </title>
+    <!-- inclusion Generale ############################################################"" -->
+    
+    		<c:import url="include/headInclude.jsp"></c:import>
+    
+    <!-- ################################################################################ -->
+    <style type="text/css">
+        tr ,th{
+            text-align: center;
+        }
+    </style>
+
+
+</head>
+
+<body>
+
+<c:choose>
+<c:when test="${sessionScope.etatSession==true}">
+
+		<c:if test="${ !empty sessionScope.role}">
+			<jsp:forward page="accueil.jsp"/>
+		</c:if>
+
+    <div id="wrapper">
+
+
+        <!-- Menu inclusion ############################################################-->
+        <c:choose>
+        	<c:when test="${!empty sessionScope.grade }">
+        		<c:import url="include/menuUtilisateurInclude.jsp"/>
+        	</c:when>
+        	<c:when test="${empty sessionScope.grade }">
+        		<c:import url="include/menuDoctorantInclude.jsp"/>
+        	</c:when>
+        </c:choose>
+        <!-- ################################################################################ -->
+
+        <!-- Page Content -->
+        <div id="page-wrapper">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-lg-12">
+                       <h1 class="page-header"><i class="fa fa-bell fa-fw"></i> Notifications</h1>
+                  
+                    <c:if test="${!empty formations }">
+                        <br><br><br>
+                        <div>
+                    <div class="panel panel-info">
+	                        <div class="panel-heading">
+	                            <i class="fa fa-child fa-fw"></i> Formations
+	                        </div>
+	                        <div class="panel-body">
+	                        <form id="formFormation" class="form-horizontal" method="post" action="">
+							<input type="hidden" name="cacher" value="formation">
+								
+	                        <div class="table-responsive">
+                                <table class="table  table-bordered ">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th> nom prenom</th>
+                                            <th>Intitule</th>
+                                            <th>Date de formation </th>
+                                             <th>Etat</th>
+                                        </tr>
+                                         </thead>
+                                    <tbody>
+                                        <c:forEach var="formation" items="${formations}">
+                                        <tr>
+                                            <td><input type="checkbox" name="activiteChoisit" value="${formation.id_formation}"></td>
+                                            <td><c:out value="${formation.nom }"/></td>
+                                            <td><c:out value="${formation.intitule }"/></td>
+                                            <td><c:out value="${formation.dateformation }"/></td>
+                                            
+                                            
+                                            <td><font color="red">attente</font>  </td>
+                                        </tr> 
+                                        </c:forEach>
+                                         
+                                    </tbody>
+                                </table>
+                           
+                            </div>
+                            <div class="form-group">
+									<button class="btn btn-danger pull-right" name="choix" value="rejeterFormation" style="margin-right: 13px">Rejeter</button>
+									<button class="btn btn-success pull-right" name="choix" value="validerFormaation" style="margin-right: 10px">Valider</button>
+							
+	                        </div>
+	                        
+	                        </form>
+	                 </div>
+                    </div>
+                    
+                    
+                    
+                    </div>
+                    
+                    </c:if>
+                    <c:if test="${!empty litteraires }">
+                        <br>
+                        <div>
+                    <div class="panel panel-primary">
+	                        <div class="panel-heading">
+	                           <i class="fa fa-edit fa-fw"></i> Creativité litteraire
+	                        </div>
+	                        <div class="panel-body">
+	                        <form id="formFormation" class="form-horizontal" method="post" action="">
+									<input type="hidden" name="cacher" value="litteraire">
+								
+	                        <div class="table-responsive">
+                                <table class="table  table-bordered ">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th> nom prenom</th>
+                                            <th>Intitule</th>
+                                            <th>Date </th>
+                                             <th>Etat</
+                                        </tr>
+                                         </thead>
+                                    <tbody>
+                                        <c:forEach var="litteraire" items="${litteraires}">
+                                        <tr>
+                                            <td><input type="checkbox" name="activiteChoisit" value="${litteraire.id_litteraire}"></td>
+                                            <td><c:out value="${litteraire.nom }"/></td>
+                                            <td><c:out value="${litteraire.intitule }"/></td>
+                                            <td><c:out value="${litteraire.datelitteraire }"/></td>
+                                            
+                                            
+                                            <td><font color="red">attente</font>  </td>
+                                        </tr> 
+                                        </c:forEach>
+                                         
+                                    </tbody>
+                                </table>
+                           
+                            </div>
+                            <div class="form-group">
+									<button class="btn btn-danger pull-right" name="choix" value="rejeterlitteraire" style="margin-right: 13px">Rejeter</button>
+									<button class="btn btn-success pull-right" name="choix" value="validerlitteraire" style="margin-right: 10px">Valider</button>
+							
+	                        </div>
+	                        
+	                        </form>
+	                 </div>
+                    </div>
+                    
+                    
+                    
+                    </div>
+                    
+                    </c:if>
+                    <c:if test="${!empty partenariats }">
+                    <div class="panel panel-info">
+	                        <div class="panel-heading">
+	                           <i class="fa fa-paste  fa-fw"></i> partenariat non financé
+	                        </div>
+	                        <div class="panel-body">
+	                        <form id="formFormation" class="form-horizontal" method="post" action="">
+									<input type="hidden" name="cacher" value="partenariat">
+								
+	                        <div class="table-responsive">
+                                <table class="table  table-bordered ">
+                                    <thead>
+                                    <tr>
+                                            <th>#</th>
+                                            <th> nom prenom</th>
+                                            <th>Intitule</th>
+                                            <th>Date </th>
+                                            <th>organisme</th>
+                                            <th> type</th>
+                                             <th>Etat</
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                         <c:forEach var="partenariat" items="${partenariats}">
+                                        <tr>
+                                            <td><input type="checkbox" name="activiteChoisit" value="${partenariat.id_partenariat}"></td>
+                                            <td><c:out value="${partenariat.nom }"/></td>
+                                            <td><c:out value="${partenariat.intitule }"/></td>
+                                            <td><c:out value="${partenariat.datePartenariat }"/></td>
+                                            <td><c:out value="${partenariat.organisme }"/></td>
+                                            <td><c:out value="${partenariat.type }"/></td>
+                                            <td><font color="red">attente</font>  </td>
+                                        </tr> 
+                                       
+                                         </c:forEach>
+                                    </tbody>
+                                  </table>
+	                        </div>
+	                        <div class="form-group">
+									<button class="btn btn-danger pull-right" name="choix" value="rejeterpartenariat"style="margin-right: 13px">Rejeter</button>
+									<button class="btn btn-success pull-right" name="choix" value="validerpartenariat" style="margin-right: 10px">Valider</button>
+							
+	                        </div>
+	                        </form>
+	                        
+	                        
+	                        
+	                        
+	                        </div>
+	                </div>      
+                  
+                    
+                    
+                    </c:if>
+                    
+                    
+                    </div>
+                    <!-- /.col-lg-12 -->
+                </div>
+                <!-- /.row -->
+            </div>
+            <!-- /.container-fluid -->
+        </div>
+        <!-- /#page-wrapper -->
+
+    </div>
+    <!-- /#wrapper -->
+
+<!-- Footer inclusion ############################################################-->
+
+        <c:import url="include/footerInclude.jsp"></c:import>
+        
+<!-- ################################################################################ -->
+
+</c:when>
+<c:when test="${ empty sessionScope.etatSession}">
+<jsp:forward page="accueil.jsp"/>
+</c:when>
+</c:choose>
+
+</body>
+</html>

@@ -1,0 +1,38 @@
+package com.pfe.beans;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class Equipe {
+	int id;
+	String nom;
+	List<String> enseignats = new ArrayList<String>();
+	List<String> doctorants = new ArrayList<String>();
+
+	public List<String> getEnseignats() {
+		return enseignats;
+	}
+	public void setEnseignats(List<String> enseignats) {
+		this.enseignats = enseignats;
+	}
+	public List<String> getDoctorants() {
+		return doctorants;
+	}
+	public void setDoctorants(List<String> doctorants) {
+		this.doctorants = doctorants;
+	}
+	public int getId() {
+		return id;
+	}
+	public void setId(int id) {
+		this.id = id;
+	}
+	public String getNom() {
+		return nom;
+	}
+	public void setNom(String nom) {
+		this.nom = nom;
+	}
+	
+
+}

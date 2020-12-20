@@ -1,0 +1,166 @@
+package com.pfe.dao;
+
+import java.sql.Connection;
+import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.pfe.beans.BrevetDroit;
+import com.pfe.beans.Formation;
+
+public class FormationDaoImpl implements FormationDao{
+	private DaoFactory daoFactory;
+
+	FormationDaoImpl(DaoFactory daoFactory) {
+		this.daoFactory = daoFactory;
+	}
+	public List<Formation> lister(int id_user, String etat) {
+		List<Formation> formations = new ArrayList<Formation>();
+		Connection connexion = null;
+		Statement statement = null;
+		ResultSet resultat = null;
+		PreparedStatement preparedStatement = null;
+
+		if (etat.equals("valide")) {
+			try {
+				connexion = daoFactory.getConnection();
+				preparedStatement = connexion
+						.prepareStatement("select * from formations where id_utilisateur=? and  validation=true ;");
+				preparedStatement.setInt(1, id_user);
+
+				resultat = preparedStatement.executeQuery();
+				while (resultat.next()) {
+					int id_formation = resultat.getInt(1);
+					String intitule = resultat.getString(2);
+					Date dateformation = resultat.getDate(3);
+					int id_utilisateur = resultat.getInt(4);
+
+					Formation formation= new Formation();
+					formation.setId_formation(id_formation);
+					formation.setIntitule(intitule);
+					formation.setDateformation(dateformation);
+					formation.setId_utilisateur(id_utilisateur);
+					
+					formations.add(formation);
+				}
+			} catch (SQLException e) {
+
+			} finally {
+				try {
+					if (resultat != null)
+						resultat.close();
+					if (statement != null)
+						statement.close();
+					if (connexion != null)
+						connexion.close();
+				} catch (SQLException ignore) {
+
+				}
+			}
+
+		} else if (etat.equals("nonvalide")) {
+			try {
+				connexion = daoFactory.getConnection();
+				preparedStatement = connexion
+						.prepareStatement("select * from formations where id_utilisateur=? and validation=false ;");
+				preparedStatement.setInt(1, id_user);
+
+				resultat = preparedStatement.executeQuery();
+				while (resultat.next()) {
+					int id_formation = resultat.getInt(1);
+					String intitule = resultat.getString(2);
+					Date dateformation = resultat.getDate(3);
+					int id_utilisateur = resultat.getInt(4);
+
+		
+
+					Formation formation= new Formation();
+					formation.setId_formation(id_formation);
+					formation.setIntitule(intitule);
+					formation.setDateformation(dateformation);
+					formation.setId_utilisateur(id_utilisateur);
+					
+					formations.add(formation);
+				}
+			} catch (SQLException e) {
+
+			} finally {
+				try {
+					if (resultat != null)
+						resultat.close();
+					if (statement != null)
+						statement.close();
+					if (connexion != null)
+						connexion.close();
+				} catch (SQLException ignore) {
+
+				}
+			}
+
+		}
+		return formations;
+	}
+	public void ajouter(Formation formation) {
+		Connection connexion = null;
+		PreparedStatement preparedStatement = null;
+
+		try {
+			connexion = daoFactory.getConnection();
+			preparedStatement = connexion.prepareStatement(
+					"INSERT INTO formations(intitule,id_Utilisateur,dateformation) VALUES(?,?,?);");
+
+			preparedStatement.setString(1, formation.getIntitule());
+			preparedStatement.setInt(2, formation.getId_utilisateur());
+			preparedStatement.setDate(3, formation.getDateformation());
+			
+			preparedStatement.executeUpdate();
+
+		} catch (SQLException e) {
+
+		}
+	
+	}
+	public void supprimer(int id) {
+		Connection connexion = null;
+		PreparedStatement preparedStatement = null;
+
+		try {
+			connexion = daoFactory.getConnection();
+			preparedStatement = connexion.prepareStatement("DELETE  FROM formations  WHERE id_formation=?");
+
+			preparedStatement.setInt(1, id);
+
+			preparedStatement.executeUpdate();
+
+		} catch (SQLException e) {
+
+		}
+
+	}
+	public void modifier(Formation formation) {
+		Connection connexion = null;
+		PreparedStatement preparedStatement = null;
+
+		try {
+			connexion = daoFactory.getConnection();
+			preparedStatement = connexion.prepareStatement("update formations SET dateformation=?,intitule=?  WHERE id_formation=?");
+
+			preparedStatement.setDate(1, formation.getDateformation());
+			preparedStatement.setString(2, formation.getIntitule());
+			preparedStatement.setInt(3,formation.getId_formation());
+			
+			
+			preparedStatement.executeUpdate();
+
+		} catch (SQLException e) {
+
+		}
+
+	}
+
+
+}

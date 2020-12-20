@@ -1,0 +1,11 @@
+127.0.0.1 - - [11/May/2018:09:09:58 +0100] "GET / HTTP/1.1" 404 962
+0:0:0:0:0:0:0:1 - - [11/May/2018:09:10:34 +0100] "GET /pfe/accueil HTTP/1.1" 200 3994
+0:0:0:0:0:0:0:1 - - [11/May/2018:09:10:44 +0100] "GET /pfe/presentation/css/font-awesome.min.css HTTP/1.1" 200 29063
+0:0:0:0:0:0:0:1 - - [11/May/2018:09:10:45 +0100] "GET /pfe/presentation/css/accueilStyle.css HTTP/1.1" 200 620
+0:0:0:0:0:0:0:1 - - [11/May/2018:09:10:45 +0100] "GET /pfe/presentation/css/bootstrap.min.css HTTP/1.1" 200 121200
+0:0:0:0:0:0:0:1 - - [11/May/2018:09:10:45 +0100] "GET /pfe/presentation/img/logoFsac.png HTTP/1.1" 200 31865
+0:0:0:0:0:0:0:1 - - [11/May/2018:09:10:45 +0100] "GET /pfe/presentation/img/user1.png HTTP/1.1" 200 10350
+0:0:0:0:0:0:0:1 - - [11/May/2018:09:10:46 +0100] "GET /pfe/presentation/js/jquery.validate.js HTTP/1.1" 304 -
+0:0:0:0:0:0:0:1 - - [11/May/2018:09:10:46 +0100] "GET /pfe/presentation/js/jquery-1.11.1.js HTTP/1.1" 304 -
+0:0:0:0:0:0:0:1 - - [11/May/2018:09:10:47 +0100] "GET /pfe/presentation/js/bootstrap.min.js HTTP/1.1" 304 -
+0:0:0:0:0:0:0:1 - - [11/May/2018:09:10:49 +0100] "GET /favicon.ico HTTP/1.1" 404 984

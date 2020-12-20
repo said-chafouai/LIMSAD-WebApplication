@@ -1,0 +1,116 @@
+package com.pfe.servlets;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import com.pfe.beans.Directeur;
+import com.pfe.beans.Utilisateur;
+import com.pfe.dao.DaoFactory;
+import com.pfe.dao.DirecteurDao;
+import com.pfe.dao.UtilisateurDao;
+
+@WebServlet("/Accueil")
+public class Accueil extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+	private UtilisateurDao utilisateurDao;
+	private DirecteurDao directeurDao;
+	
+	public void init() throws ServletException{
+		DaoFactory daoFactory = DaoFactory.getInstance();
+		this.utilisateurDao = daoFactory.getUtilisateurDao();
+		this.directeurDao = daoFactory.getDirecteurDao();
+	}
+	   
+    
+    public Accueil() {
+        super();
+    }
+
+	
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		HttpSession session = request.getSession();
+		session.invalidate();
+		this.getServletContext().getRequestDispatcher("/WEB-INF/accueil.jsp").forward(request, response);
+	}
+
+	
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
+		HttpSession session = request.getSession();
+		List<Utilisateur> utilisateurs = new ArrayList<Utilisateur>();
+		List<Directeur> directeurs = new ArrayList<Directeur>();
+		
+		directeurs = directeurDao.lister();
+		utilisateurs = utilisateurDao.lister();
+		
+		String email = request.getParameter("email").toLowerCase();
+		String mdp = request.getParameter("mdp");
+		int taille = utilisateurs.size(), i;
+		int tailleDirecteur = directeurs.size(), j;
+		boolean etat = false , etatDirecteur=false;
+		
+		
+		// Test Directeur :: 
+		
+		for(j=0; j<tailleDirecteur; j++)
+		{
+			if(directeurs.get(j).getEmail().equals(email) && directeurs.get(j).getMdp().equals(mdp)) {
+				session.setAttribute("role", "directeur");
+				session.setAttribute("etatSession", true);
+				session.setAttribute("nom", directeurs.get(j).getNom().toUpperCase());
+				session.setAttribute("prenom", directeurs.get(j).getPrenom());
+				session.setAttribute("email", directeurs.get(j).getEmail());
+				session.setAttribute("mdp", directeurs.get(j).getMdp());
+				etatDirecteur = true;
+				break;	
+			}
+		}
+		
+		
+		
+		
+		
+		
+		// Test utilisateur (enseignant chercheur)
+		if(etatDirecteur == false) {
+			for(i = 0; i < taille; i++) {
+				if(utilisateurs.get(i).getEmail().equalsIgnoreCase(email) && utilisateurs.get(i).getMdp().equals(mdp) && utilisateurs.get(i).isEtat()==true ) {
+					session.setAttribute("etatSession", true);
+					session.setAttribute("login",utilisateurs.get(i).getLogin());
+					session.setAttribute("nom", utilisateurs.get(i).getNom().toUpperCase());
+					session.setAttribute("prenom", utilisateurs.get(i).getPrenom());
+					session.setAttribute("email", utilisateurs.get(i).getEmail());
+					session.setAttribute("mdp", utilisateurs.get(i).getMdp());
+					session.setAttribute("grade", utilisateurs.get(i).getGrade());
+					session.setAttribute("cne", utilisateurs.get(i).getCne());
+					session.setAttribute("gsm",utilisateurs.get(i).getGsm());
+					session.setAttribute("these",utilisateurs.get(i).getThese());
+			 		etat = true;
+			 		break;
+			 	}		
+			}
+			
+		}
+		
+		if(etatDirecteur == true) {
+			this.getServletContext().getRequestDispatcher("/WEB-INF/notificationDirecteur.jsp").forward(request, response);
+		}else if(etat == true) {
+			request.setAttribute("utilisateurs", utilisateurs);
+			this.getServletContext().getRequestDispatcher("/WEB-INF/notification.jsp").forward(request, response);
+		}else {
+			String message = "Email ou Mot de passe est incorrect!!!";
+		 	request.setAttribute("message",message);
+		 	this.getServletContext().getRequestDispatcher("/WEB-INF/accueil.jsp").forward(request, response);	
+		}
+
+	}
+
+}

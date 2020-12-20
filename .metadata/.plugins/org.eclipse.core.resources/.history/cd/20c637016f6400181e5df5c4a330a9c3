@@ -1,0 +1,14 @@
+package com.pfe.dao;
+
+import java.util.List;
+
+import com.pfe.beans.Equipe;
+
+public interface EquipeDao {
+	public List<Equipe> lister();
+	public void supprimer(int id);
+	public void ajouter(Equipe equipe) ;
+	public void modifier(Equipe equipe);
+	public List<Equipe> listerStructure();
+	public int dernierEquipe();
+}

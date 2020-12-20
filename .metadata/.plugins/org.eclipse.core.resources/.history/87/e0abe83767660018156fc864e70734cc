@@ -1,0 +1,103 @@
+package com.pfe.form;
+
+import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import com.pfe.beans.BrevetDroit;
+import com.pfe.dao.BrevetDroitDao;
+import com.pfe.dao.DaoFactory;
+
+
+@WebServlet("/Upload")
+public class Upload extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+	public static final String CHEMIN = "chemin";
+	public static final String ATT_FICHIER = "fichier";
+	public static final String ATT_FORM = "form";
+	public static final String VUE = "/WEB-INF/upload.jsp";
+	
+	private BrevetDroitDao brevetdroitDao;
+	public void init() throws ServletException{
+		DaoFactory daoFactory = DaoFactory.getInstance();	
+		this.brevetdroitDao = daoFactory.getBrevetDroitDao();
+
+       
+	}
+       
+  
+    public Upload() {
+        super();
+    }
+
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		/* Affichage de la page d'upload */
+		BrevetDroit brevetDroit = new BrevetDroit();
+		brevetDroit = brevetdroitDao.listerbrevet(5);
+		request.setAttribute("bds","bonjour said");	
+		System.out.println(""+brevetDroit.getPreuve());
+		request.setAttribute("bd",brevetDroit.getPreuve());
+		this.getServletContext().getRequestDispatcher(VUE).forward( request, response );
+	}
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
+		
+			
+			
+		
+	
+		
+		/*
+		* Lecture du paramètre 'chemin' passé à la servlet via la déclaration dans le web.xml
+		*/
+		String chemin = this.getServletConfig().getInitParameter(CHEMIN );
+		
+		/* Préparation de l'objet formulaire */
+		UploadForm form = new UploadForm();
+		
+		/* Traitement de la requête et récupération du bean en résultant */
+		Fichier fichier = form.enregistrerFichier(request, chemin);
+		
+		System.out.println(fichier.getNom());
+		/* Stockage du formulaire et du bean dans l'objet request
+		*/
+		request.setAttribute( ATT_FORM, form );
+		request.setAttribute( ATT_FICHIER, fichier );
+		/* creer un ouvrage*/
+		SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
+		
+        String datesaisie="2018-1-25";
+        java.util.Date dateutil=null;
+			try {
+				dateutil = sdf.parse(datesaisie);
+			} catch (ParseException e) {
+				e.printStackTrace();
+			}
+			
+			Integer id_user = 30;
+			java.sql.Date datesql=new java.sql.Date(dateutil.getTime());
+			BrevetDroit brevetDroit = new BrevetDroit();
+			brevetDroit.setIntitule("brevet10");
+			brevetDroit.setType("type2");
+			brevetDroit.setNumeroDepot(10);
+			brevetDroit.setNumeroEnregistrement(10);
+			brevetDroit.setDateDepot(datesql);
+			brevetDroit.setChampApplication("champ10");
+			brevetDroit.setActeurexterne("auteur10");
+			brevetDroit.setId_utilisateur(id_user);
+			brevetDroit.setPreuve(fichier.getNom());
+			brevetdroitDao.ajouter(brevetDroit);
+			
+			//############################################
+		this.getServletContext().getRequestDispatcher(VUE).forward( request, response );
+	}
+
+}

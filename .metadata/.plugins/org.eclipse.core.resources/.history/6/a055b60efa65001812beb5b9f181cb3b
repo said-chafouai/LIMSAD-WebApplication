@@ -1,0 +1,28 @@
+package com.pfe.form;
+
+import java.util.HashMap;
+import java.util.Map;
+
+public final class UploadForm {
+	private static final String CHAMP_DESCRIPTION = "description";
+	private static final String CHAMP_FICHIER = "fichier";
+	private static final int TAILLE_TAMPON = 10240;
+	
+	private String resultat;
+	private Map<String, String> erreurs = new HashMap<String, String>();
+
+	
+	public String getResultat() {
+		return resultat;
+	}
+	public void setResultat(String resultat) {
+		this.resultat = resultat;
+	}
+	public Map<String, String> getErreurs() {
+		return erreurs;
+	}
+	public void setErreurs(Map<String, String> erreurs) {
+		this.erreurs = erreurs;
+	}
+
+}

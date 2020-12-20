@@ -1,0 +1,78 @@
+package com.pfe.servlets;
+
+import java.io.IOException;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import com.pfe.beans.Equipe;
+import com.pfe.beans.Utilisateur;
+import com.pfe.dao.DaoFactory;
+import com.pfe.dao.EquipeDao;
+import com.pfe.dao.UtilisateurDao;
+
+@WebServlet("/Equipes")
+public class Equipes extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+	private EquipeDao equipeDao;
+	private UtilisateurDao utilisateurDao;
+	
+	public void init() throws ServletException{
+		DaoFactory daoFactory = DaoFactory.getInstance();
+		this.equipeDao = daoFactory.getEquipeDao();
+		this.utilisateurDao = daoFactory.getUtilisateurDao();
+
+	} 
+ 
+    public Equipes() {
+        super();
+    }
+
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
+	   
+	   
+		request.setAttribute("equipesStructure", equipeDao.listerStructure());
+		request.setAttribute("equipes", equipeDao.lister());
+		request.setAttribute("utilisateurs",utilisateurDao.lister());
+		this.getServletContext().getRequestDispatcher("/WEB-INF/equipe.jsp").forward(request, response);
+	}
+
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
+		String form = request.getParameter("form");
+		if(form.equals("ajouter")) {
+			String nom = request.getParameter("nom");			
+			
+			Utilisateur user = new Utilisateur();
+			Integer chef = Integer.parseInt(request.getParameter("chef"));
+			Equipe equipe = new Equipe();
+			equipe.setNom(nom);
+			equipe.setChef(chef);
+			equipeDao.ajouter(equipe);
+			int dernier = equipeDao.dernierEquipe();			
+			String enseignants[] = request.getParameterValues("enseignants");
+			for(int i=0; i<enseignants.length; i++) {
+				user.setLogin(Integer.parseInt(enseignants[i]));
+				user.setEquipe(dernier);
+				utilisateurDao.modifier(user, "equipe");
+			}
+			
+			String doctorants[] = request.getParameterValues("doctorants");
+			for(int i=0; i<doctorants.length; i++) {
+				user.setLogin(Integer.parseInt(doctorants[i]));
+				user.setEquipe(dernier);
+				utilisateurDao.modifier(user, "equipe");
+			}
+		}
+		
+		
+		doGet(request,response);
+	}
+
+}

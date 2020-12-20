@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+	<title> Communication dans une conference  </title>
+    <!-- inclusion Generale ############################################################"" -->
+    
+    		<c:import url="include/headInclude.jsp"></c:import>
+    
+    <!-- ################################################################################ -->
+    <style type="text/css">
+		#chart-container{
+			width: 640px;
+			height: auto;
+		}
+	</style>
+
+</head>
+
+<body>
+
+<c:choose>
+<c:when test="${sessionScope.etatSession==true}">   
+	<c:if test="${empty sessionScope.role}">
+		<jsp:forward page="accueil.jsp"/>
+	</c:if> 
+
+	<div id="wrapper">
+	
+	<!-- Menu inclusion ############################################################-->
+	
+        		<c:import url="include/menuDirecteurInclude.jsp"/>
+        		
+   <!-- ################################################################################ -->
+
+        <!-- Page Content -->
+        <div id="page-wrapper">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <h1 class="page-header"><i class="fa fa-bar-chart-o fa-fw"></i>Bilan</h1>
+                        <div id="">
+							<canvas id="mycanvas"></canvas>
+						</div>
+						<div id="resultat"></div>
+						<div>
+							<h3>Générer Rapport</h3>
+							<div>
+							<form id="formBudget" class="form-inline" method="post" action="bilan">
+								<div class="well">
+									<div class="form-group">
+										<label for="dateDubet">Date Début</label>
+										<input type="date" name="dateDubet" class="form-control">
+									</div>
+									<div class="form-group">
+										<label for="dateFin">date Fin</label>
+										<input type="date" name="dateFin" class="form-control">
+									</div>
+									<div class="form-group">
+										<button class="btn btn-success pull-right">Générer Rapport</button>
+									</div>
+								</div>
+							</form>
+						</div>
+						</div>
+						
+						<div>
+							<h3>Gérer Budget</h3>
+							<form id="formBudget" class="form-horizontal" method="post" action="bilan">
+								<div class="well">
+									<div class="form-group">
+										<label for="budget"> le Budget <font color="red">*</font></label>
+										<input type="text" name="budget" class="form-control">
+									</div>
+									<div class="form-group">
+										<label for="dateBudget">date<font color="red">*</font></label>
+										<input type="date" name="dateBudget" class="form-control">
+									</div>
+									<div class="form-group">
+										<button class="btn btn-success pull-right">Enregistrer</button>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+                    <!-- /.col-lg-12 -->
+                </div>
+                <!-- /.row -->
+            </div>
+            <!-- /.container-fluid -->
+        </div>
+        <!-- /#page-wrapper -->
+
+    </div>
+    <!-- /#wrapper -->
+
+ 
+<!-- Footer inclusion ############################################################-->
+
+        <c:import url="include/footerInclude.jsp"></c:import>
+        
+<!-- ################################################################################ -->
+<script type="text/javascript" src="presentation/js/jquery-3.3.1.min.js"></script>
+<script type="text/javascript" src="presentation/js/Chart.min.js"></script>
+
+<script type="text/javascript">
+	$(document).ready(function() {
+		$.ajax({
+			url : 'Budgets',
+			headers : {
+				Accept : "application/json; charset=utf-8",
+				"content-Type" : "application/json; charset=utf-8"
+			},
+			success : function(res) {
+				var user = $.parseJSON(res);
+				var date = [];
+				var somme = [];
+
+				for ( var i in user) {
+					date.push("" + user[i].dateBudget);
+					somme.push(user[i].somme);
+				}
+				document.getElementById('resultat').innerHTML = '';
+				var chartbudgets = {
+					labels : date,
+					datasets : [ {
+						label : 'Budget',
+						backgroundColor : 'blue',
+						borderColor : 'rgba(200,200,200,0.75)',
+						hoverBackgroundColors : 'rgba(200,200,200,1)',
+						hoverBorderColor : 'rgba(200,200,200,1)',
+						data : somme
+					} ]
+				};
+
+				var ctx = $("#mycanvas");
+
+				var barGraph = new Chart(ctx, {
+					type : 'bar',
+					data : chartbudgets
+				});
+
+			}
+		});
+	});
+</script>
+    
+</c:when>
+<c:when test="${ empty sessionScope.etatSession}">
+<jsp:forward page="accueil.jsp"/>
+</c:when>
+
+
+
+
+
+
+</c:choose>
+
+</body>
+
+</html>

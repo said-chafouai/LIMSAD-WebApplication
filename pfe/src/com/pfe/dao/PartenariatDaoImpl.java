@@ -1,0 +1,408 @@
+package com.pfe.dao;
+
+import java.sql.Connection;
+import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.pfe.beans.Partenariat;
+
+public class PartenariatDaoImpl implements PartenariatDao {
+
+	
+		private DaoFactory daoFactory;
+
+		PartenariatDaoImpl(DaoFactory daoFactory) {
+			this.daoFactory = daoFactory;
+		}
+public void ajouter(Partenariat partenariat) {
+			Connection connexion = null;
+			PreparedStatement preparedStatement = null;
+
+			try {
+				connexion = daoFactory.getConnection();
+				preparedStatement = connexion.prepareStatement(
+						"INSERT INTO partenariats ( intitule, type, organismepartenaire, datepartenariat, id_utilisateur) VALUES(?,?,?,?,?);");
+
+				preparedStatement.setString(1, partenariat.getIntitule());
+				preparedStatement.setString(2, partenariat.getType());
+				preparedStatement.setString(3, partenariat.getOrganisme());
+				preparedStatement.setDate(4, partenariat.getDatePartenariat());
+				preparedStatement.setInt(5, partenariat.getId_utilisateur());
+				
+				
+				
+				preparedStatement.executeUpdate();
+
+			} catch (SQLException e) {
+
+			}
+		
+		}
+public void declarer_participant(int id_partenariat, int id_participant) {
+
+	Connection connexion = null;
+	PreparedStatement preparedStatement = null;
+
+	try {
+		connexion = daoFactory.getConnection();
+		preparedStatement = connexion.prepareStatement(
+				"INSERT  INTO participationpartenariat(id_partenariat,id_utilisateur) value(?,?)");
+
+		preparedStatement.setInt(1, id_partenariat);
+		preparedStatement.setInt(2, id_participant);
+
+		preparedStatement.executeUpdate();
+
+	} catch (SQLException e) {
+
+	}
+}
+public int dernierPartenariat() {
+
+	Connection connexion = null;
+
+	ResultSet resultat = null;
+	PreparedStatement preparedStatement = null;
+	try {
+		connexion = daoFactory.getConnection();
+		preparedStatement = connexion.prepareStatement("select max(id_partenariat) from partenariats  ;");
+		resultat = preparedStatement.executeQuery();
+		resultat.next();
+		int max_partenariat = resultat.getInt(1);
+
+		return max_partenariat;
+	} catch (SQLException e) {
+
+	}
+	return 0;
+
+}
+public List<Partenariat> lister(int id_user, String etat) {
+	List<Partenariat> partenariats = new ArrayList<Partenariat>();
+	Connection connexion = null;
+	Statement statement = null;
+	ResultSet resultat = null;
+	PreparedStatement preparedStatement = null;
+
+	if (etat.equals("valide")) {
+		try {
+			connexion = daoFactory.getConnection();
+			preparedStatement = connexion
+					.prepareStatement("select * from partenariats where id_utilisateur=? and  validation=true ;");
+			preparedStatement.setInt(1, id_user);
+
+			resultat = preparedStatement.executeQuery();
+			while (resultat.next()) {
+				int id_partenariat = resultat.getInt(1);
+				String intitule = resultat.getString(2);
+				String type = resultat.getString(3);
+				int id_utilisateur = resultat.getInt(6);
+				String organisme = resultat.getString(4);
+				Date datepartenariat = resultat.getDate(5);
+
+				Partenariat partenariat = new Partenariat();
+				partenariat.setId_partenariat(id_partenariat);
+				partenariat.setIntitule(intitule);
+				partenariat.setType(type);
+				partenariat.setOrganisme(organisme);
+				partenariat.setId_utilisateur(id_utilisateur);
+				partenariat.setDatePartenariat(datepartenariat);
+
+				partenariats.add(partenariat);
+			}
+		} catch (SQLException e) {
+
+		} finally {
+			try {
+				if (resultat != null)
+					resultat.close();
+				if (statement != null)
+					statement.close();
+				if (connexion != null)
+					connexion.close();
+			} catch (SQLException ignore) {
+
+			}
+		}
+
+	} else if (etat.equals("nonvalide")) {
+		try {
+			connexion = daoFactory.getConnection();
+			preparedStatement = connexion
+					.prepareStatement("select * from partenariats where id_utilisateur=? and validation=false ;");
+			preparedStatement.setInt(1, id_user);
+
+			resultat = preparedStatement.executeQuery();
+			while (resultat.next()) {
+				int id_partenariat = resultat.getInt(1);
+				String intitule = resultat.getString(2);
+				String type = resultat.getString(3);
+				int id_utilisateur = resultat.getInt(6);
+				String organisme = resultat.getString(4);
+				Date datepartenariat = resultat.getDate(5);
+
+				Partenariat partenariat = new Partenariat();
+				partenariat.setId_partenariat(id_partenariat);
+				partenariat.setIntitule(intitule);
+				partenariat.setOrganisme(organisme);
+				partenariat.setType(type);
+				partenariat.setId_utilisateur(id_utilisateur);
+				partenariat.setDatePartenariat(datepartenariat);
+
+				partenariats.add(partenariat);
+				}
+		}catch (SQLException e) {
+
+		} finally {
+			try {
+				if (resultat != null)
+					resultat.close();
+				if (statement != null)
+					statement.close();
+				if (connexion != null)
+					connexion.close();
+			} catch (SQLException ignore) {
+
+			}
+		}
+
+	}
+	return partenariats;
+}public List<Partenariat> lister_participant(int id_user, String etat) {
+	List<Partenariat> partenariats = new ArrayList<Partenariat>();
+	Connection connexion = null;
+	Statement statement = null;
+	ResultSet resultat = null;
+	PreparedStatement preparedStatement = null;
+
+	if (etat.equals("valide")) {
+		try {
+			connexion = daoFactory.getConnection();
+			preparedStatement = connexion.prepareStatement(
+					"select b.* from partenariats b join participationpartenariat p where p.id_partenariat=b.id_partenariat and p.id_utilisateur=? and b.validation=true;");
+			preparedStatement.setInt(1, id_user);
+
+			resultat = preparedStatement.executeQuery();
+			while (resultat.next()) {
+				int id_partenariat = resultat.getInt(1);
+				String intitule = resultat.getString(2);
+				String type = resultat.getString(3);
+				int id_utilisateur = resultat.getInt(6);
+				String organisme = resultat.getString(4);
+				Date datepartenariat = resultat.getDate(5);
+
+				Partenariat partenariat = new Partenariat();
+				partenariat.setId_partenariat(id_partenariat);
+				partenariat.setOrganisme(organisme);
+				partenariat.setIntitule(intitule);
+				partenariat.setType(type);
+				partenariat.setId_utilisateur(id_utilisateur);
+				partenariat.setDatePartenariat(datepartenariat);
+
+				partenariats.add(partenariat);
+				}
+		} catch (SQLException e) {
+
+		} finally {
+			try {
+				if (resultat != null)
+					resultat.close();
+				if (statement != null)
+					statement.close();
+				if (connexion != null)
+					connexion.close();
+			} catch (SQLException ignore) {
+
+			}
+		}
+
+	} else if (etat.equals("nonvalide")) {
+		try {
+			connexion = daoFactory.getConnection();
+			preparedStatement = connexion.prepareStatement(
+					"select b.* from partenariats b join participationpartenariat p where p.id_partenariat=b.id_partenariat and p.id_utilisateur=? and b.validation=false;");
+			preparedStatement.setInt(1, id_user);
+
+			resultat = preparedStatement.executeQuery();
+			while (resultat.next()) {
+				int id_partenariat = resultat.getInt(1);
+				String intitule = resultat.getString(2);
+				String type = resultat.getString(3);
+				int id_utilisateur = resultat.getInt(6);
+				String organisme = resultat.getString(4);
+				Date datepartenariat = resultat.getDate(5);
+
+				Partenariat partenariat = new Partenariat();
+				partenariat.setId_partenariat(id_partenariat);
+				partenariat.setOrganisme(organisme);
+				partenariat.setIntitule(intitule);
+				partenariat.setType(type);
+				partenariat.setId_utilisateur(id_utilisateur);
+				partenariat.setDatePartenariat(datepartenariat);
+
+				partenariats.add(partenariat);
+				}
+		} catch (SQLException e) {
+
+		} finally {
+			try {
+				if (resultat != null)
+					resultat.close();
+				if (statement != null)
+					statement.close();
+				if (connexion != null)
+					connexion.close();
+			} catch (SQLException ignore) {
+
+			}
+		}
+
+	}
+	return partenariats;
+}
+public void supprimer(int id) {
+	Connection connexion = null;
+	PreparedStatement preparedStatement = null;
+
+	try {
+		connexion = daoFactory.getConnection();
+		preparedStatement = connexion.prepareStatement("DELETE  FROM partenariats  WHERE id_partenariat=?");
+
+		preparedStatement.setInt(1, id);
+
+		preparedStatement.executeUpdate();
+
+	} catch (SQLException e) {
+
+	}
+
+}
+public void supprimerP(int id) {
+	Connection connexion = null;
+	PreparedStatement preparedStatement = null;
+
+	try {
+		connexion = daoFactory.getConnection();
+		preparedStatement = connexion.prepareStatement("DELETE  FROM participationpartenariat  WHERE id_partenariat=?");
+
+		preparedStatement.setInt(1, id);
+
+		preparedStatement.executeUpdate();
+
+	} catch (SQLException e) {
+
+	}
+
+}
+public void modifier(Partenariat partenariat) {
+	Connection connexion = null;
+	PreparedStatement preparedStatement = null;
+
+	try {
+		connexion = daoFactory.getConnection();
+		preparedStatement = connexion.prepareStatement("update partenariats SET datepartenariat=?,intitule=?,type=?,organismepartenaire=? WHERE id_partenariat=?");
+
+		preparedStatement.setDate(1, partenariat.getDatePartenariat());
+		preparedStatement.setString(2, partenariat.getIntitule());
+		preparedStatement.setString(3,partenariat.getType());
+		preparedStatement.setString(4,partenariat.getOrganisme());
+		preparedStatement.setInt(5,partenariat.getId_partenariat());
+		
+		
+		
+		preparedStatement.executeUpdate();
+
+	} catch (SQLException e) {
+
+	}
+
+
+
+
+}
+public List<Partenariat> lister(int id_user) {
+	List<Partenariat> partenariats = new ArrayList<Partenariat>();
+	Connection connexion = null;
+	Statement statement = null;
+	ResultSet resultat = null;
+	PreparedStatement preparedStatement = null;
+
+	
+		try {
+			connexion = daoFactory.getConnection();
+			preparedStatement = connexion
+					.prepareStatement("select u.nom,u.prenom,f.id_partenariat,f.intitule,f.datepartenariat,f.organismePartenaire , f.type from partenariats f,utilisateurs u where u.id_encadrant=? and u.id_utilisateur=f.id_utilisateur and f.validation=false ;");
+			preparedStatement.setInt(1, id_user);
+
+			resultat = preparedStatement.executeQuery();
+			while (resultat.next()) {
+				String nom=resultat.getString(1)+" "+ resultat.getString(2);
+				int id_partenariat= resultat.getInt(3);
+				String intitule = resultat.getString(4);
+				Date datepartenariat = resultat.getDate(5);
+				String organisme=resultat.getString(6);
+				String type=resultat.getString(7);
+				
+	
+
+	
+
+				Partenariat partenariat= new Partenariat();
+				partenariat.setId_partenariat(id_partenariat);
+				partenariat.setIntitule(intitule);
+				partenariat.setDatePartenariat(datepartenariat);
+				partenariat.setType(type);
+				partenariat.setOrganisme(organisme);
+				partenariat.setNom(nom);
+				partenariats.add(partenariat);
+			}
+		} catch (SQLException e) {
+
+		} finally {
+			try {
+				if (resultat != null)
+					resultat.close();
+				if (statement != null)
+					statement.close();
+				if (connexion != null)
+					connexion.close();
+			} catch (SQLException ignore) {
+
+			}
+		}
+
+	
+	return partenariats;
+} 
+public void valide(int id) {
+	Connection connexion = null;
+	PreparedStatement preparedStatement = null;
+
+	try {
+		connexion = daoFactory.getConnection();
+		preparedStatement = connexion.prepareStatement("update partenariats SET validation=true WHERE id_partenariat=?");
+
+		
+		preparedStatement.setInt(1,id);
+		
+		
+		
+		preparedStatement.executeUpdate();
+
+	} catch (SQLException e) {
+
+	}
+
+
+
+
+}
+
+		
+		
+}

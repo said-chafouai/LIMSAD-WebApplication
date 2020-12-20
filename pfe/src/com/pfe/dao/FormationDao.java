@@ -1,0 +1,14 @@
+package com.pfe.dao;
+
+import java.util.List;
+
+import com.pfe.beans.Formation;
+
+public interface FormationDao {
+	public List<Formation> lister(int id_user, String etat);
+	public void ajouter(Formation formation);
+	public void supprimer(int id);
+	public void modifier(Formation formation);
+	public List<Formation> lister(int id_user) ;
+	public void valide(int id);
+}

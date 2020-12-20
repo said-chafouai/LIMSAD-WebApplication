@@ -1,0 +1,312 @@
+package com.pfe.dao;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.pfe.beans.Journal;
+
+public class JournalDaoImpl implements JournalDao{
+	private DaoFactory daoFactory;
+
+	JournalDaoImpl(DaoFactory daoFactory) {
+		this.daoFactory = daoFactory;
+	}
+	public void ajouter(Journal journal,String etat) {
+		Connection connexion = null;
+		PreparedStatement preparedStatement = null;
+
+		try {
+			connexion = daoFactory.getConnection();
+			
+					
+		preparedStatement = connexion.prepareStatement("INSERT INTO journals ( intitule,journal, baseIndexation, datepublication, id_utilisateur,type) VALUES(?,?,?,?,?,?);");
+					
+					
+			preparedStatement.setString(1, journal.getIntitule());
+			preparedStatement.setString(2, journal.getJournal());
+			preparedStatement.setString(3, journal.getBaseIndexation());
+			preparedStatement.setDate(4, journal.getDatePublication());
+			preparedStatement.setInt(5, journal.getId_utilisateur());
+			preparedStatement.setString(6, etat);
+			
+			
+			
+			preparedStatement.executeUpdate();
+
+		} catch (SQLException e) {
+
+		}
+	
+	}
+	public void declarer_participant(int id_journal, int id_participant) {
+
+		Connection connexion = null;
+		PreparedStatement preparedStatement = null;
+
+		try {
+			connexion = daoFactory.getConnection();
+			preparedStatement = connexion.prepareStatement(
+					"INSERT  INTO participationjournal(id_journal,id_utilisateur) value(?,?)");
+
+			preparedStatement.setInt(1, id_journal);
+			preparedStatement.setInt(2, id_participant);
+
+			preparedStatement.executeUpdate();
+
+		} catch (SQLException e) {
+
+		}
+	}
+	public int dernierJournal() {
+
+		Connection connexion = null;
+
+		ResultSet resultat = null;
+		PreparedStatement preparedStatement = null;
+		try {
+			connexion = daoFactory.getConnection();
+			preparedStatement = connexion.prepareStatement("select max(id_journal) from journals  ;");
+			resultat = preparedStatement.executeQuery();
+			resultat.next();
+			int max_journal = resultat.getInt(1);
+
+			return max_journal;
+		} catch (SQLException e) {
+
+		}
+		return 0;
+
+	}
+	public List<Journal> lister(int id_user, String etat,String type) {
+		List<Journal> journals = new ArrayList<Journal>();
+		Connection connexion = null;
+		Statement statement = null;
+		ResultSet resultat = null;
+		PreparedStatement preparedStatement = null;
+
+		if (etat.equals("valide")) {
+			try {
+				connexion = daoFactory.getConnection();
+				preparedStatement = connexion
+						.prepareStatement("select * from journals where id_utilisateur=? and  validation=true and type=? ;");
+				preparedStatement.setInt(1, id_user);
+				preparedStatement.setString(2, type);
+				resultat = preparedStatement.executeQuery();
+				while (resultat.next()) {
+				
+					
+
+					Journal journal = new Journal();
+					journal.setId_journal(resultat.getInt(1));
+					journal.setIntitule(resultat.getString(2));
+					journal.setJournal(resultat.getString(3));
+					journal.setBaseIndexation(resultat.getString(4));
+					journal.setId_utilisateur(resultat.getInt(7));
+					journal.setDatePublication(resultat.getDate(5));
+
+					journals.add(journal);
+				}
+			} catch (SQLException e) {
+
+			} finally {
+				try {
+					if (resultat != null)
+						resultat.close();
+					if (statement != null)
+						statement.close();
+					if (connexion != null)
+						connexion.close();
+				} catch (SQLException ignore) {
+
+				}
+			}
+
+		} else if (etat.equals("nonvalide")) {
+			try {
+				connexion = daoFactory.getConnection();
+				preparedStatement = connexion
+						.prepareStatement("select * from journals where id_utilisateur=? and validation=false and type=? ;");
+				preparedStatement.setInt(1, id_user);
+				preparedStatement.setString(2, type);
+
+				resultat = preparedStatement.executeQuery();
+				while (resultat.next()) {
+					Journal journal = new Journal();
+					journal.setId_journal(resultat.getInt(1));
+					journal.setIntitule(resultat.getString(2));
+					journal.setJournal(resultat.getString(3));
+					journal.setBaseIndexation(resultat.getString(4));
+					journal.setId_utilisateur(resultat.getInt(7));
+					journal.setDatePublication(resultat.getDate(5));
+
+					journals.add(journal);
+				}
+			}catch (SQLException e) {
+
+			} finally {
+				try {
+					if (resultat != null)
+						resultat.close();
+					if (statement != null)
+						statement.close();
+					if (connexion != null)
+						connexion.close();
+				} catch (SQLException ignore) {
+
+				}
+			}
+
+		}
+		return journals;
+	}
+	public List<Journal> lister_participant(int id_user, String etat,String type) {
+		List<Journal> journals = new ArrayList<Journal>();
+		Connection connexion = null;
+		Statement statement = null;
+		ResultSet resultat = null;
+		PreparedStatement preparedStatement = null;
+
+		if (etat.equals("valide")) {
+			try {
+				connexion = daoFactory.getConnection();
+				preparedStatement = connexion.prepareStatement(
+						"select b.* from journals b join participationjournal p where p.id_journal=b.id_journal and p.id_utilisateur=? and b.validation=true and p.type=?;");
+				preparedStatement.setInt(1, id_user);
+				preparedStatement.setString(2, type);
+
+				resultat = preparedStatement.executeQuery();
+				while (resultat.next()) {
+					Journal journal = new Journal();
+					journal.setId_journal(resultat.getInt(1));
+					journal.setIntitule(resultat.getString(2));
+					journal.setJournal(resultat.getString(3));
+					journal.setBaseIndexation(resultat.getString(4));
+					journal.setId_utilisateur(resultat.getInt(7));
+					journal.setDatePublication(resultat.getDate(5));
+
+					journals.add(journal);
+				}
+			} catch (SQLException e) {
+
+			} finally {
+				try {
+					if (resultat != null)
+						resultat.close();
+					if (statement != null)
+						statement.close();
+					if (connexion != null)
+						connexion.close();
+				} catch (SQLException ignore) {
+
+				}
+			}
+
+		} else if (etat.equals("nonvalide")) {
+			try {
+				connexion = daoFactory.getConnection();
+				preparedStatement = connexion.prepareStatement(
+						"select b.* from journals b join participationjournal p where p.id_journal=b.id_journal and p.id_utilisateur=? and b.validation=falseand p.type=?;");
+				preparedStatement.setInt(1, id_user);
+				preparedStatement.setString(2, type);
+
+				resultat = preparedStatement.executeQuery();
+				while (resultat.next()) {
+					Journal journal = new Journal();
+					journal.setId_journal(resultat.getInt(1));
+					journal.setIntitule(resultat.getString(2));
+					journal.setJournal(resultat.getString(3));
+					journal.setBaseIndexation(resultat.getString(4));
+					journal.setId_utilisateur(resultat.getInt(7));
+					journal.setDatePublication(resultat.getDate(5));
+
+					journals.add(journal);
+				}
+			} catch (SQLException e) {
+
+			} finally {
+				try {
+					if (resultat != null)
+						resultat.close();
+					if (statement != null)
+						statement.close();
+					if (connexion != null)
+						connexion.close();
+				} catch (SQLException ignore) {
+
+				}
+			}
+
+		}
+		return journals;
+	}
+	 public void supprimer(int id) {
+			Connection connexion = null;
+			PreparedStatement preparedStatement = null;
+
+			try {
+				connexion = daoFactory.getConnection();
+				preparedStatement = connexion.prepareStatement("DELETE  FROM journals  WHERE id_journal=?");
+
+				preparedStatement.setInt(1, id);
+
+				preparedStatement.executeUpdate();
+
+			} catch (SQLException e) {
+
+			}
+
+		}
+	    public void supprimerP(int id) {
+			Connection connexion = null;
+			PreparedStatement preparedStatement = null;
+
+			try {
+				connexion = daoFactory.getConnection();
+				preparedStatement = connexion.prepareStatement("DELETE  FROM participationjournal  WHERE id_journal=?");
+
+				preparedStatement.setInt(1, id);
+
+				preparedStatement.executeUpdate();
+
+			} catch (SQLException e) {
+
+			}
+
+		}
+	    public void modifier(Journal journal) {
+			Connection connexion = null;
+			PreparedStatement preparedStatement = null;
+
+			try {
+				connexion = daoFactory.getConnection();
+				preparedStatement = connexion.prepareStatement("update journals SET datePublication=?,intitule=?,baseIndexation=?,journal=? WHERE id_journal=?");
+
+				preparedStatement.setDate(1, journal.getDatePublication());
+				preparedStatement.setString(2, journal.getIntitule());
+				preparedStatement.setString(3,journal.getBaseIndexation());
+				preparedStatement.setString(4,journal.getJournal());
+				
+				preparedStatement.setInt(5,journal.getId_journal());
+				
+				
+				preparedStatement.executeUpdate();
+
+			} catch (SQLException e) {
+
+			}
+
+
+		
+		
+	}
+
+	
+	
+	
+
+}

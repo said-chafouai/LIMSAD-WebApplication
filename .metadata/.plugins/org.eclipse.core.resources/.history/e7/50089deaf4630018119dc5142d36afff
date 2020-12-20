@@ -1,0 +1,141 @@
+package com.pfe.dao;
+
+import java.sql.Connection;
+import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.pfe.beans.BrevetDroit;
+import com.pfe.beans.These;
+
+public class TheseDaoImpl implements TheseDao{
+private DaoFactory daoFactory;
+	
+	TheseDaoImpl(DaoFactory daoFactory){
+		this.daoFactory = daoFactory;
+	}
+	public List<These> lister(int id,String etat){
+	
+		List<These> theses = new ArrayList<These>();
+		Connection connexion = null;
+		PreparedStatement preparedStatement = null;
+		ResultSet resultat = null;
+
+		try {
+			connexion = daoFactory.getConnection();
+			if(etat.equals("soutenu")) {
+			preparedStatement = connexion.prepareStatement("select u.nom,u.prenom,t.id_these,t.id_directeurThese,t.datePremierInscription,t.dateSoutenance,t.theseCotutelle,t.EtablissementCotutelle,t.sujet,t.id_doctorant from theses t,utilisateurs u where u.id_utilisateur=t.id_doctorant && t.id_directeurThese=? && dateSoutenance is not null ;");
+			}
+			else {preparedStatement = connexion.prepareStatement("select u.nom,u.prenom,t.id_these,t.id_directeurThese,t.datePremierInscription,t.dateSoutenance,t.theseCotutelle,t.EtablissementCotutelle,t.sujet,t.id_doctorant from theses t,utilisateurs u where u.id_utilisateur=t.id_doctorant && t.id_directeurThese=? && dateSoutenance is null ;");
+			}
+			preparedStatement.setInt(1, id);
+
+			resultat = preparedStatement.executeQuery();
+
+			while(resultat.next()) {
+				These these =new These();
+			these.setId_these(resultat.getInt("id_these"));
+			these.setNom(resultat.getString("nom")+" "+resultat.getString("prenom"));
+			
+			these.setDatePremierInscription(resultat.getDate("datePremierInscription"));
+			these.setDateSoutenance(resultat.getDate("dateSoutenance"));
+			these.setTheseCotutelle(resultat.getString("theseCotutelle"));
+			these.setPrenom(resultat.getString("EtablissementCotutelle"));
+			these.setSujet(resultat.getString("sujet"));
+			these.setId_doctorant(resultat.getInt("id_doctorant"));
+			these.setId_directeurThese(id);
+			theses.add(these);
+			}
+
+		} catch (SQLException e) {
+
+		} finally {
+			try {
+				if (resultat != null)
+					resultat.close();
+				if (preparedStatement != null)
+					preparedStatement.close();
+				if (connexion != null)
+					connexion.close();
+			} catch (SQLException ignore) {
+
+			}
+		}
+
+		return theses;
+	}
+	public void supprimer(int id) {
+		Connection connexion = null;
+		PreparedStatement preparedStatement = null;
+
+		try {
+			connexion = daoFactory.getConnection();
+			preparedStatement = connexion.prepareStatement("DELETE  FROM theses  WHERE id_these=?");
+
+			preparedStatement.setInt(1, id);
+
+			preparedStatement.executeUpdate();
+
+		} catch (SQLException e) {
+
+		}
+
+	}
+	public void ajouter(These these) {
+		Connection connexion = null;
+		PreparedStatement preparedStatement = null;
+
+		try {
+			connexion = daoFactory.getConnection();
+			preparedStatement = connexion.prepareStatement(
+			"INSERT INTO `theses` (`id_these`, `datePremierInscription`, `dateSoutenance`, `theseCotutelle`, `EtablissementCotutelle`, `sujet`, `id_doctorant`, `id_directeurThese`) VALUES (NULL,?,?,?,?,?,?,?);");
+
+			preparedStatement.setDate(1,these.getDatePremierInscription());
+			preparedStatement.setDate(2, these.getDateSoutenance());
+			preparedStatement.setString(3, these.getTheseCotutelle());
+			preparedStatement.setString(4, these.getEtablissement());
+			preparedStatement.setString(5, these.getSujet());
+			preparedStatement.setInt(6,these.getId_doctorant());
+			preparedStatement.setInt(7, these.getId_directeurThese());
+		
+
+			preparedStatement.executeUpdate();
+
+		} catch (SQLException e) {
+
+		}
+		}
+		
+		
+		public void modifier(These these) {
+			Connection connexion = null;
+			PreparedStatement preparedStatement = null;
+
+			try {
+				connexion = daoFactory.getConnection();
+				preparedStatement = connexion.prepareStatement("update theses SET datePremierInscription=?,dateSoutenance=?,theseCotutelle=?,EtablissementCotutelle=?,id_doctorant=?,id_directeurThese=?,sujet=?  WHERE id_these=?");
+
+				preparedStatement.setDate(1, these.getDatePremierInscription());
+				preparedStatement.setDate(2, these.getDateSoutenance());
+				preparedStatement.setString(3, these.getTheseCotutelle());
+				preparedStatement.setString(4, these.getEtablissement());
+				preparedStatement.setInt(5, these.getId_doctorant());
+				preparedStatement.setInt(6, these.getId_directeurThese());
+				preparedStatement.setString(7, these.getSujet());
+				preparedStatement.setInt(8, these.getId_these());
+				
+				preparedStatement.executeUpdate();
+
+			} catch (SQLException e) {
+
+			}
+
+		}
+		
+		
+	}
+

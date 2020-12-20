@@ -1,0 +1,199 @@
+package com.pfe.dao;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.pfe.beans.Equipe;
+
+public class EquipeDaoImpl implements EquipeDao{
+	private DaoFactory daoFactory;
+
+	EquipeDaoImpl(DaoFactory daoFactory) {
+		this.daoFactory = daoFactory;
+	}
+	
+	public List<Equipe> lister(){
+		List<Equipe> equipes = new ArrayList<Equipe>();
+		Connection connexion = null;
+		Statement statement = null;
+		ResultSet resultat = null;
+		
+		try {
+			connexion = daoFactory.getConnection();
+			statement = connexion.createStatement();
+			resultat = statement.executeQuery("SELECT * from equipes;");
+			
+			while(resultat.next()) {
+				Equipe equipe = new Equipe();
+				
+				equipe.setId(resultat.getInt("id_equipe"));
+				equipe.setNom(resultat.getString("nom"));
+				
+				equipes.add(equipe);
+			}
+		}catch(SQLException e) {
+			e.printStackTrace();
+			
+		}finally {
+			try {
+				if(resultat != null)
+					resultat.close();
+				if(statement != null)
+					statement.close();
+				if(connexion != null)
+					connexion.close();
+			}catch(SQLException ignore) {
+				
+			}
+		}
+		return equipes;
+	}
+	
+	
+	public List<Equipe> listerStructure(){
+		List<Equipe> equipes = new ArrayList<Equipe>();
+		Connection connexion = null;
+		Statement statement = null;
+		ResultSet resultat = null;
+		
+		try {
+			connexion = daoFactory.getConnection();
+			statement = connexion.createStatement();
+			resultat = statement.executeQuery("SELECT id_equipe, nom, id_chef from equipes;");
+			
+			while(resultat.next()) {
+				Equipe equipe = new Equipe();
+
+				equipe.setChef(resultat.getInt("id_chef"));
+				equipe.setId(resultat.getInt("id_equipe"));
+				equipe.setNom(resultat.getString("nom"));
+				
+				PreparedStatement preparedStatement = null;
+				ResultSet resultatMembre = null;
+				
+				try {
+					
+					preparedStatement = connexion.prepareStatement("select id_utilisateur from utilisateurs where id_equipe=? and cne is null;");
+					preparedStatement.setInt(1,resultat.getInt("id_equipe"));
+					
+					resultatMembre = preparedStatement.executeQuery();
+					
+					List<Integer> enseignants = new ArrayList<Integer>();
+					
+					while(resultatMembre.next()) {
+						enseignants.add(resultatMembre.getInt("id_utilisateur"));
+					}
+					
+					equipe.setEnseignants(enseignants);
+					
+					preparedStatement.close();
+					resultatMembre.close();
+					
+					preparedStatement = connexion.prepareStatement("select id_utilisateur from utilisateurs where id_equipe=? and grade is null;");
+					preparedStatement.setInt(1,resultat.getInt("id_equipe"));
+					
+					resultatMembre = preparedStatement.executeQuery();
+					
+					List<Integer> doctorants = new ArrayList<Integer>();
+					while(resultatMembre.next()) {
+						doctorants.add(resultatMembre.getInt("id_utilisateur"));
+					}
+					
+					equipe.setDoctorants(doctorants);
+					
+				}catch(SQLException e1) {
+					e1.printStackTrace();
+					
+				}finally {
+					try {
+						if(preparedStatement != null)
+							preparedStatement.close();
+						if(resultatMembre != null)
+							resultatMembre.close();
+					}catch(SQLException ignore) {
+						
+					}
+				}
+				
+				
+				equipes.add(equipe);
+			}
+		}catch(SQLException e) {
+			e.printStackTrace();
+			
+		}finally {
+			try {
+				if(resultat != null)
+					resultat.close();
+				if(statement != null)
+					statement.close();
+				if(connexion != null)
+					connexion.close();
+			}catch(SQLException ignore) {
+				
+			}
+		}
+		return equipes;
+	}
+	
+	
+	
+	
+	
+	public void supprimer(int id) {
+		Connection connexion = null;
+		PreparedStatement preparedStatement = null;
+
+		try {
+			connexion = daoFactory.getConnection();
+			preparedStatement = connexion.prepareStatement("DELETE FROM equipes where id_equipe=?;");
+			preparedStatement.setInt(1, id);
+
+			preparedStatement.executeUpdate();
+
+		} catch (SQLException e) {
+
+		}
+	}
+	
+	public void ajouter(String nom) {
+		Connection connexion = null;
+		PreparedStatement preparedStatement = null;
+		 
+		try {
+			connexion = daoFactory.getConnection();
+			preparedStatement = connexion.prepareStatement("INSERT into equipes(nom,id_directeur) VALUES(?,'directeur');"); 
+			preparedStatement.setString(1, nom);
+			
+			preparedStatement.executeUpdate();
+			
+		}catch(SQLException e) {
+			e.printStackTrace();
+			
+		}		
+	}
+	
+	
+	public void modifier(Equipe equipe) {
+		Connection connexion = null;
+		PreparedStatement preparedStatement = null;
+
+		try {
+			connexion = daoFactory.getConnection();
+			preparedStatement = connexion.prepareStatement( "UPDATE equipes set nom=? where id_equipe=?");
+			preparedStatement.setInt(1, equipe.getId());
+			preparedStatement.setString(2, equipe.getNom());
+
+			preparedStatement.executeUpdate();
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+
+}

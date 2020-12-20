@@ -1,0 +1,13 @@
+package com.pfe.dao;
+
+import java.util.List;
+
+import com.pfe.beans.Equipe;
+
+public interface EquipeDao {
+	public List<Equipe> lister();
+	public void supprimer(int id);
+	public void ajouter(String nom);
+	public void modifier(Equipe equipe);
+	
+}

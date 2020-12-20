@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+	<title> Communication dans une conference  </title>
+    <!-- inclusion Generale ############################################################"" -->
+    
+    		<c:import url="include/headInclude.jsp"></c:import>
+    
+    <!-- ################################################################################ -->
+
+</head>
+
+<body>
+
+<c:choose>
+<c:when test="${sessionScope.etatSession==true}">
+	
+	<c:if test="${ !empty sessionScope.role or !empty sessionScope.grade}">
+		<jsp:forward page="accueil.jsp"/>
+	</c:if>
+
+    <div id="wrapper">
+
+
+        <!-- Menu inclusion ############################################################-->
+        <c:choose>
+        	<c:when test="${!empty sessionScope.grade }">
+        		<c:import url="include/menuUtilisateurInclude.jsp"/>
+        	</c:when>
+        	<c:when test="${empty sessionScope.grade }">
+        		<c:import url="include/menuDoctorantInclude.jsp"/>
+        	</c:when>
+        </c:choose>
+        <!-- ################################################################################ -->
+
+        <!-- Page Content -->
+        <div id="page-wrapper">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <h1 class="page-header"><font color="red"><i class="fa fa-child fa-fw"></i></font>Formation Personnelle</h1>
+                    <ul class="nav bouton">
+						<p>	
+							<a href="#visulaisez" data-toggle="tab" class="btn btn-primary">Visualiser</a>
+							<a href="#ajouterEvenement" data-toggle="tab" class="btn btn-success">Ajouter</a>
+							<a href="#modifier" data-toggle="tab" class="btn btn-warning">Modifier</a>
+							<a href="#supprimerbrevet" data-toggle="tab" class="btn btn-danger">Supprimer</a>
+						</p>
+					</ul>
+
+						<!-- Tab panes -->
+						<div class="tab-content">
+							<div class="tab-pane fade in active" id="visulaisez">
+								
+								<!-- Affichage des activite  -->
+								
+								 <div class="table-responsive">
+                                <table class="table  table-bordered ">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Intitule</th>
+                                            <th>Date de formation </th>
+                                             <th>Etat</
+                                        </tr>
+                                         <c:set var="vari" value="1" scope="request"/>
+                                    </thead>
+                                    <tbody><c:forEach var="formation" items="${formations}">
+                                        <tr>
+                                            <td><c:out value="${vari }"/></td>
+                                            <td><c:out value="${formation.intitule }"/></td>
+                                            <td><c:out value="${formation.dateformation}"/></td>
+                                        
+                                            <td><font color="red">En Attente</font>  </td>
+                                        </tr> <c:set var="vari" value="${requestScope.vari+1 }" scope="request"/>
+                                        
+                                        </c:forEach>
+                                        
+                                        
+                                        
+                                        
+                                        <c:forEach var="formation" items="${formationsvalide}">
+                                        <tr>
+                                            <td><c:out value="${vari }"/></td>
+                                            <td><c:out value="${formation.intitule }"/></td>
+                                            <td><c:out value="${formation.dateformation }"/></td>
+                                            
+                                            
+                                            <td><font color="green">validé</font>  </td>
+                                        </tr> <c:set var="vari" value="${requestScope.vari+1 }" scope="request"/>
+                                        
+                                        </c:forEach>
+                                         
+                                    </tbody>
+                                </table>
+                            </div>
+								
+								<!-- END affichage activite -->
+							</div>
+							<div class="tab-pane fade" id="ajouterEvenement">
+								<br>
+								<div>
+									<form id="formFormation" class="form-horizontal" method="post" action="">
+									<input type="hidden" name="cacher" value="ajouter">
+									<div class="well">
+                                        <div class="">
+                                            <div class="form-group">
+                                               <label for="intitule">Intitule<font color="red">*</font></label> 
+                                               <input type="text" name="intitule" class="form-control"> 
+                                            </div>
+                                     <div class="form-group">
+                                               <label for="dateFormation">Date de Foramtion<font color="red">*</font></label>
+                                                <input type="date" name="dateFormation" class="form-control"> 
+                                            </div>
+                                            <div class="form-group">
+                                                <button class="btn btn-success pull-right">Enregistrer</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>  
+								</div>
+							</div>
+							<div class="tab-pane fade" id="modifier">
+										<div class="table-responsive">
+                                <table class="table  table-bordered ">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Intitule</th>
+                                            <th>date de Formation</th>
+                                            <th>Etat</th>
+                                         </tr>
+                                      </thead>
+                                   
+                                    <tbody><c:forEach var="formation" items="${formations}">
+                                        <tr>
+                                             <td><input type="radio" name="formationsModifier" value="${formation.id_formation}"></td>
+                                            <td><c:out value="${formation.intitule }"/></td>
+                                            <td><c:out value="${formation.dateformation }"/></td>
+                                            <td><font color="red">En Attente</font>  </td>
+                                        </tr> 
+                                        
+                                        </c:forEach>
+                                        
+                                        </tbody>
+                                        </table>
+                                     </div>
+													
+								<form id="formMdifier" class="form-horizontal" method="post" action="">
+											
+								</form>
+							
+							</div>
+							<div class="tab-pane fade" id="supprimerbrevet">
+								<form id="formEvenement" class="form-horizontal" method="Post" action="">
+									<input type="hidden" name="cacher" value="supprimer"/>
+									<input type="hidden" name="id" value="${sessionScope.email }">
+									
+								 <div class="table-responsive">
+                                <table class="table  table-bordered ">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Intitule</th>
+                                            <th>date de Formation</th>
+                                            <th>Etat</th>
+                                        </tr>
+                                        
+                                    </thead>
+                                    <tbody><c:forEach var="formation" items="${formations}">
+                                        <tr>
+                                            <td><input type="checkbox" name="formationsSupprime" value="${formation.id_formation}"></td>
+                                            <td><c:out value="${formation.intitule }"/></td>
+                                            <td><c:out value="${formation.dateformation }"/></td>
+                                            <td><font color="red">En Attente</font>  </td>
+                                        </tr> 
+                                        
+                                        </c:forEach>
+                                        
+                                        </tbody>
+                                        </table>
+                                     </div>
+													<button class="btn btn-danger pull-right">Supprimer</button>
+													</form>
+												
+
+								<!--  End suppression  d'un evenement -->
+							</div>
+                    </div>
+                    <!-- /.col-lg-12 -->
+                </div>
+                <!-- /.row -->
+            </div>
+            <!-- /.container-fluid -->
+        </div>
+        <!-- /#page-wrapper -->
+
+    </div>
+    <!-- /#wrapper -->
+    
+    
+<!-- Footer inclusion ############################################################-->
+
+        <c:import url="include/footerInclude.jsp"></c:import>
+        
+<!-- ################################################################################ -->
+
+
+<script >
+
+$(document).ready(function(){
+
+	$('input:radio').click(function(){
+	
+		$('input:radio[name=formationsModifier]:checked').each(function(){
+			
+			var tr = $(this).parents('tr').find('td').length;
+			var tab = new Array();
+			for (var i = 1; i < tr; i++) 
+				tab[i] = $(this).parents('tr').find('td').eq(i).html();   						
+			
+
+$('#formMdifier').html("<input type='hidden' name='cacher' value='modifier'><div class='row'>"+
+		
+		"<div class='well'>"+
+			"<input type='hidden' name='idformation' value="+$('input:radio[name=formationsModifier]:checked').val()+">"+
+			
+			"<div class=''>"+
+				"<div class='form-group'>"+
+					"<label for='intitule'>intitule<font color='red'>*</font></label>"+
+					"<input type='text' name='intitule' class='form-control' value="+tab[1]+">"+
+				"</div>"+
+				"<div class='form-group'>"+
+					" <label for='dateformation'>date de formation<font color='red'>*</font></label>"+ 
+					"<input type='date' name='dateformation' class='form-control' value="+tab[2]+">"+
+				"</div>"+
+				
+				
+				"<div class='form-group'>"+
+					"<button class='btn btn-success pull-right'>Enregistrer</button>"+
+				"</div>"+
+			"</div>"+
+		"</div>");
+
+})
+
+});
+});
+
+</script>
+</c:when>
+<c:when test="${ empty sessionScope.etatSession}">
+<jsp:forward page="accueil.jsp"/>
+</c:when>
+</c:choose>
+
+</body>
+
+</html>
