@@ -21,8 +21,8 @@ public class EmailBeans {
 		 
 		 String host = "smtp.gmail.com";
 		 String port = "587";
-         final String userName = "laboratoirefsac@gmail.com";
-         final String password = "labo_-@2018@)fsac"; 
+         final String userName = "";
+         final String password = ""; 
 		
 		 
 		 
