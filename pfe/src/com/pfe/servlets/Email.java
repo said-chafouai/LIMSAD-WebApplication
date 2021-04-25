@@ -24,7 +24,7 @@ public class Email extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException{
 
         // outgoing message information
-        String mailTo = "chafouaisaid.97@gmail.com";
+        String mailTo = "";
         String subject = "Limsad";
         String message = "testing email";
 
